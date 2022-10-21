@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.request.dto.NewUserRequest;
+import ru.practicum.explorewithme.user.dto.NewUserRequest;
 import ru.practicum.explorewithme.user.dto.UserDto;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @Validated
@@ -19,15 +19,17 @@ import java.util.Collection;
 @RequiredArgsConstructor
 @RequestMapping(path = "/admin/users")
 public class UserController {
+    private final UserService userService;
+
     @GetMapping
-    public Collection<UserDto> findUsers(@RequestParam Long[] ids,
-                                         @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-                                         @Positive @RequestParam(defaultValue = "10") Integer size,
-                                         HttpServletRequest request) {
+    public List<UserDto> findUsers(@RequestParam Long[] ids,
+                                   @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                   @Positive @RequestParam(defaultValue = "10") Integer size,
+                                   HttpServletRequest request) {
         log.info("{}: {}; получение списка пользователей",
                 request.getRemoteAddr(),
                 request.getRequestURI());
-        return null;
+        return userService.findUsers(ids, from, size);
     }
 
     @PostMapping()
@@ -36,7 +38,7 @@ public class UserController {
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 newUserRequest.toString());
-        return null;
+        return userService.create(newUserRequest);
     }
 
     @DeleteMapping("/{userId}")
@@ -45,5 +47,6 @@ public class UserController {
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 userId);
+        userService.delete(userId);
     }
 }
