@@ -11,30 +11,31 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @Validated
 @RestController
 @RequiredArgsConstructor
 public class CategoryController {
+    private final CategoryService categoryService;
     @GetMapping("/categories/{categoryId}")
     public CategoryDto findCategoryById(@PathVariable Long categoryId, HttpServletRequest request) {
         log.info("{}: {}; на получение категории ID={}",
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 categoryId);
-        return null;
+        return categoryService.findCategoryById(categoryId);
     }
 
     @GetMapping("/categories")
-    public Collection<CategoryDto> findCategories(@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-                                                  @Positive @RequestParam(defaultValue = "10") Integer size,
-                                                  HttpServletRequest request) {
+    public List<CategoryDto> findCategories(@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                            @Positive @RequestParam(defaultValue = "10") Integer size,
+                                            HttpServletRequest request) {
         log.info("{}: {}; получение списка категорий",
                 request.getRemoteAddr(),
                 request.getRequestURI());
-        return null;
+        return categoryService.findCategories(from, size);
     }
 
     @PatchMapping("/admin/categories")
@@ -43,7 +44,7 @@ public class CategoryController {
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 categoryDto.toString());
-        return null;
+        return categoryService.update(categoryDto);
     }
 
     @PostMapping("/admin/categories")
@@ -52,7 +53,7 @@ public class CategoryController {
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 newCategoryDto.toString());
-        return null;
+        return categoryService.create(newCategoryDto);
     }
 
     @DeleteMapping("/admin/categories/{categoryId}")
@@ -61,5 +62,6 @@ public class CategoryController {
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 categoryId);
+        categoryService.delete(categoryId);
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.common.OffsetPage;
 import ru.practicum.explorewithme.common.exception.NotFoundException;
-import ru.practicum.explorewithme.common.exception.UserAlreadyExistException;
+import ru.practicum.explorewithme.common.exception.AlreadyExistException;
 import ru.practicum.explorewithme.user.dto.NewUserRequest;
 import ru.practicum.explorewithme.user.dto.UserDto;
 import ru.practicum.explorewithme.user.model.User;
@@ -33,7 +33,7 @@ public class UserServiceImp implements UserService {
     @Override
     public UserDto create(NewUserRequest newUserRequest) {
         if (userRepository.existsByEmail(newUserRequest.getEmail())) {
-            throw new UserAlreadyExistException("Пользователь с электронной почтой " + newUserRequest.getEmail() +
+            throw new AlreadyExistException("Пользователь с электронной почтой " + newUserRequest.getEmail() +
                     " существует");
         }
         User user = userRepository.save(UserMapper.mapToUser(newUserRequest));
