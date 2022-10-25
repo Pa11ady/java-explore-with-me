@@ -1,8 +1,8 @@
 package ru.practicum.explorewithme.common.exception;
 
 //@ResponseStatus(HttpStatus.NOT_FOUND)
-public class NotFoundException extends RuntimeException {
-    public NotFoundException(String message) {
+public class ForbiddenException extends RuntimeException {
+    public ForbiddenException(String message) {
         super(message);
     }
 }

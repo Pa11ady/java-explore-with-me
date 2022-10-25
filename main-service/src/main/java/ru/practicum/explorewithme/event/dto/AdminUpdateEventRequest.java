@@ -1,9 +1,11 @@
 package ru.practicum.explorewithme.event.dto;
 
-import lombok.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
-import ru.practicum.explorewithme.common.Location;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import ru.practicum.explorewithme.event.Location;
 
 import java.time.LocalDateTime;
 

@@ -5,8 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-public enum State {
-    PENDING,
-    PUBLISHED,
-    CANCELED;
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class Location {
+    private Double lat;
+    private Double lon;
 }

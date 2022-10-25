@@ -3,8 +3,7 @@ package ru.practicum.explorewithme.event.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
-import ru.practicum.explorewithme.common.Location;
+import ru.practicum.explorewithme.event.Location;
 
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;

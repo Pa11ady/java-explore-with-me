@@ -1,10 +1,9 @@
 package ru.practicum.explorewithme.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import ru.practicum.explorewithme.category.dto.CategoryDto;
-import ru.practicum.explorewithme.common.Location;
+import ru.practicum.explorewithme.event.Location;
 import ru.practicum.explorewithme.event.State;
 import ru.practicum.explorewithme.user.dto.UserShortDto;
 
