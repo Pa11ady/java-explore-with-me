@@ -12,23 +12,26 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @Validated
 @RestController
 @RequiredArgsConstructor
 public class CompilationController {
+    private final CompilationService compilationService;
 
     @GetMapping("/compilations")
-    public Collection<CompilationDto> findCompilations(@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-                                                       @Positive @RequestParam(defaultValue = "10") Integer size,
-                                                       @RequestParam(required = false) Boolean pinned, HttpServletRequest request) {
+    public List<CompilationDto> findCompilations(@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                 @Positive @RequestParam(defaultValue = "10") Integer size,
+                                                 @RequestParam(defaultValue = "false") Boolean pinned,
+                                                 HttpServletRequest request) {
         log.info("{}: {};  получение подборок с {} в количестве {}",
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 from,
                 size);
-        return null;
+        return compilationService.findCompilations(from, size, pinned);
     }
 
     @GetMapping("/compilations/{compId}")
@@ -37,7 +40,7 @@ public class CompilationController {
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 compId);
-        return null;
+        return compilationService.findCompilationById(compId);
     }
 
     @PostMapping("/admin/compilations")
@@ -46,7 +49,7 @@ public class CompilationController {
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 newCompilationDto.toString());
-        return null;
+        return compilationService.create(newCompilationDto);
     }
 
     @DeleteMapping("/admin/compilations/{compId}")
@@ -55,25 +58,27 @@ public class CompilationController {
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 compId);
+        compilationService.delete(compId);
     }
 
     @DeleteMapping("/admin/compilations/{compId}/events/{eventId}")
-    public void deleteEventFromCompilation(@PathVariable Long compId, @PathVariable Long eventId, HttpServletRequest request) {
+    public void deleteEvent(@PathVariable Long compId, @PathVariable Long eventId, HttpServletRequest request) {
         log.info("{}: {}; удаление события ID={} из подборки ID={}",
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 eventId,
                 compId);
+        compilationService.deleteEvent(compId, eventId);
     }
 
     @PatchMapping("/admin/compilations/{compId}/events/{eventId}")
-    public CompilationDto addEventToComp(@PathVariable Long compId, @PathVariable Long eventId, HttpServletRequest request) {
+    public CompilationDto addEvent(@PathVariable Long compId, @PathVariable Long eventId, HttpServletRequest request) {
         log.info("{}: {}; добавление события ID={} в подборку ID={}",
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 eventId,
                 compId);
-        return null;
+        return compilationService.addEvent(compId, eventId);
     }
 
     @DeleteMapping("/admin/compilations/{compId}/pin")
@@ -82,7 +87,7 @@ public class CompilationController {
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 compId);
-        return null;
+        return compilationService.unpin(compId);
     }
 
     @PatchMapping("/admin/compilations/{compId}/pin")
@@ -91,6 +96,6 @@ public class CompilationController {
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 compId);
-        return null;
+        return compilationService.pin(compId);
     }
 }

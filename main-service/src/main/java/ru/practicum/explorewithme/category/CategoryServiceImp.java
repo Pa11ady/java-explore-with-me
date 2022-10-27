@@ -12,6 +12,9 @@ import ru.practicum.explorewithme.category.model.Category;
 import ru.practicum.explorewithme.common.OffsetPage;
 import ru.practicum.explorewithme.common.exception.AlreadyExistException;
 import ru.practicum.explorewithme.common.exception.NotFoundException;
+import ru.practicum.explorewithme.common.exception.NotValidException;
+import ru.practicum.explorewithme.event.EventRepository;
+import ru.practicum.explorewithme.event.model.Event;
 
 import java.util.List;
 
@@ -20,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryServiceImp implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final EventRepository eventRepository;
 
     private Category getCategory(Long categoryId) {
         return categoryRepository.findById(categoryId)
@@ -63,7 +67,10 @@ public class CategoryServiceImp implements CategoryService {
     @Transactional
     @Override
     public void delete(Long categoryId) {
-        //todo Нельзя удалить категорию с событиями!
+        List<Event> events =  eventRepository.findByCategoryId(categoryId);
+        if (!events.isEmpty()) {
+            throw new NotValidException("Нельзя удалить категорию с событиями!");
+        }
         getCategory(categoryId);
         categoryRepository.deleteById(categoryId);
     }

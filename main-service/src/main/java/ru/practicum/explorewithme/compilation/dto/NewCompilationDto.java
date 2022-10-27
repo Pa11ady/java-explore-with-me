@@ -3,7 +3,7 @@ package ru.practicum.explorewithme.compilation.dto;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -14,5 +14,5 @@ public class NewCompilationDto {
     @NotBlank
     private String title;
     private boolean pinned = false;
-    private List<Long> events;
+    private Set<Long> events;
 }

@@ -1,9 +1,12 @@
 package ru.practicum.explorewithme.compilation.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.practicum.explorewithme.event.dto.EventShortDto;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -13,5 +16,5 @@ public class CompilationDto {
     private Long id;
     private String title;
     private boolean pinned;
-    private List<EventShortDto> events;
+    private Set<EventShortDto> events;
 }

@@ -36,7 +36,7 @@ public class RequestServiceImp implements RequestService {
 
     private ParticipationRequest getParticipationRequest(Long requestId) {
         return requestRepository.findById(requestId).orElseThrow(() -> new NotFoundException(
-                "ParticipationRequest with id=" + requestId + " not found."));
+                "Запрос ID=" + requestId + " не найден!"));
     }
 
     @Override
