@@ -139,6 +139,7 @@ public class EventServiceImp implements EventService {
         return EventMapper.mapToEventFullDto(event);
     }
 
+    @Transactional
     @Override
     public EventFullDto cancel(Long eventId, Long userId) {
         getUser(userId);
@@ -184,7 +185,7 @@ public class EventServiceImp implements EventService {
         if (!event.getState().equals(State.PUBLISHED)) {
             throw new ForbiddenException("Нельзя отклонять в неопубликованном событии!");
         }
-        return requestService.reject(event, reqId);
+        return requestService.reject(reqId);
     }
 
     @Override
@@ -194,6 +195,7 @@ public class EventServiceImp implements EventService {
         return null;
     }
 
+    @Transactional
     @Override
     public EventFullDto updateAdmin(Long eventId, AdminUpdateEventRequest adminUpdateEventRequest) {
         Category category = null;
@@ -232,6 +234,7 @@ public class EventServiceImp implements EventService {
         return EventMapper.mapToEventFullDto(eventRepository.save(event));
     }
 
+    @Transactional
     @Override
     public EventFullDto publish(Long eventId) {
         Event event = getEvent(eventId);
@@ -248,6 +251,7 @@ public class EventServiceImp implements EventService {
         return EventMapper.mapToEventFullDto(eventRepository.save(event));
     }
 
+    @Transactional
     @Override
     public EventFullDto rejectAdmin(Long eventId) {
         Event event = getEvent(eventId);

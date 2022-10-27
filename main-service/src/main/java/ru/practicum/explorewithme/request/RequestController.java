@@ -13,12 +13,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(path = "/users")
 public class RequestController {
+    private final RequestService requestService;
+
     @GetMapping("/{userId}/requests")
     public List<ParticipationRequestDto> findRequestsByUserId(@PathVariable Long userId,
                                                               HttpServletRequest request) {
         log.info("{}: {}; получение заявок от пользователя ID={}",
                 request.getRemoteAddr(), request.getRequestURI(), userId);
-        return null;
+        return requestService.findRequestsByUserId(userId);
     }
 
     @PostMapping("/{userId}/requests")
@@ -27,7 +29,7 @@ public class RequestController {
                                           HttpServletRequest request) {
         log.info("{}: {}; участие в событии ID={} от пользователя ID={}",
                 request.getRemoteAddr(), request.getRequestURI(), eventId, userId);
-        return null;
+        return requestService.create(userId, eventId);
     }
 
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
@@ -36,6 +38,6 @@ public class RequestController {
                                           HttpServletRequest request) {
         log.info("{}: {}; отмена заявки ID={} от пользователя ID={}",
                 request.getRemoteAddr(), request.getRequestURI(), requestId, userId);
-        return null;
+        return requestService.cancel(userId, requestId);
     }
 }
