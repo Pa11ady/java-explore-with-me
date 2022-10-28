@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface RequestService {
     int getAmountParticipants(Event event);
+
     List<ParticipationRequestDto> findRequestsByEvent(Event event);
 
     ParticipationRequestDto confirm(Event event, Long reqId);

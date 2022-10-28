@@ -27,9 +27,9 @@ public class UserMapper {
 
     public static User mapToUser(NewUserRequest newUserRequest) {
         User user = new User();
-        user.setEmail( newUserRequest.getEmail());
-        user.setName( newUserRequest.getName());
-        user.setEmail( newUserRequest.getEmail());
+        user.setEmail(newUserRequest.getEmail());
+        user.setName(newUserRequest.getName());
+        user.setEmail(newUserRequest.getEmail());
         return user;
     }
 }

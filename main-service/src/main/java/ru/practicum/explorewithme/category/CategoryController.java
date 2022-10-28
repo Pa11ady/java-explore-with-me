@@ -19,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
+
     @GetMapping("/categories/{categoryId}")
     public CategoryDto findCategoryById(@PathVariable Long categoryId, HttpServletRequest request) {
         log.info("{}: {}; на получение категории ID={}",

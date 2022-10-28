@@ -55,7 +55,7 @@ public class EventServiceImp implements EventService {
     public EventFullDto findEventByID(Long eventId) {
         Event event = getEvent(eventId);
         if (!State.PUBLISHED.equals(event.getState())) {
-            throw new ForbiddenException("Event not published.");
+            throw new ForbiddenException("Событие не опубликовано!");
         }
         //todo статистика
         return EventMapper.mapToEventFullDto(event);

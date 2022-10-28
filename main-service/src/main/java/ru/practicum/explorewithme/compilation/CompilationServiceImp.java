@@ -28,8 +28,8 @@ public class CompilationServiceImp implements CompilationService {
     private final EventRepository eventRepository;
 
     private Compilation getCompilation(Long compId) {
-        return compilationRepository.findById(compId).orElseThrow(() -> new NotFoundException("Compilation with id=" +
-                compId + " was not found."));
+        return compilationRepository.findById(compId).orElseThrow(() -> new NotFoundException("Подборка ID=" +
+                compId + " не найдена!"));
     }
 
     private Event getEvent(Long eventId) {
@@ -50,14 +50,14 @@ public class CompilationServiceImp implements CompilationService {
     @Override
     public List<CompilationDto> findCompilations(Integer from, Integer size, Boolean pinned) {
         Pageable pageable = new OffsetPage(from, size, Sort.by(Sort.Direction.ASC, "id"));
-        List<Compilation> Compilations;
+        List<Compilation> compilations;
         if (pinned) {
-            Compilations = compilationRepository.findAllByPinned(pinned, pageable);
+            compilations = compilationRepository.findAllByPinned(pinned, pageable);
 
         } else {
-            Compilations = compilationRepository.findAll(pageable).getContent();
+            compilations = compilationRepository.findAll(pageable).getContent();
         }
-        return CompilationMapper.mapToCompilationDto(Compilations);
+        return CompilationMapper.mapToCompilationDto(compilations);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class CompilationServiceImp implements CompilationService {
         try {
             compilationRepository.deleteById(compId);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Compilation with id=" + compId + " was not found.");
+            throw new NotFoundException("Подборка ID=" + compId + " не найдена!");
         }
     }
 
