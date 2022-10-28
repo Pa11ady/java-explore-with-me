@@ -6,7 +6,7 @@ import ru.practicum.explorewithme.request.dto.ParticipationRequestDto;
 import java.util.List;
 
 public interface RequestService {
-    int getAmountParticipants(Event event);
+    long getAmountConfirmedParticipants(Long eventId);
 
     List<ParticipationRequestDto> findRequestsByEvent(Event event);
 

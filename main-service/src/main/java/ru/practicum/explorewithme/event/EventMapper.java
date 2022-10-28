@@ -22,7 +22,6 @@ public class EventMapper {
         eventFullDto.setId(event.getId());
         eventFullDto.setAnnotation(event.getAnnotation());
         eventFullDto.setCategory(new CategoryDto(event.getCategory().getId(), event.getCategory().getName()));
-        //todo confirmedRequests
         eventFullDto.setCreatedOn(event.getCreatedOn());
         eventFullDto.setDescription(event.getDescription());
         eventFullDto.setEventDate(event.getEventDate());
@@ -34,7 +33,6 @@ public class EventMapper {
         eventFullDto.setRequestModeration(event.getRequestModeration());
         eventFullDto.setState(event.getState());
         eventFullDto.setTitle(event.getTitle());
-        //todo views
         return eventFullDto;
     }
 
@@ -53,12 +51,11 @@ public class EventMapper {
         eventShortDto.setId(event.getId());
         eventShortDto.setAnnotation(event.getAnnotation());
         eventShortDto.setCategory(new CategoryDto(event.getCategory().getId(), event.getCategory().getName()));
-        //todo confirmedRequests
         eventShortDto.setEventDate(event.getEventDate());
         eventShortDto.setInitiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()));
         eventShortDto.setPaid(event.getPaid());
         eventShortDto.setTitle(event.getTitle());
-        //todo views
+        eventShortDto.setParticipantLimit(event.getParticipantLimit());
         return eventShortDto;
     }
 
@@ -71,8 +68,6 @@ public class EventMapper {
 
         return result;
     }
-
-
 
     public static Event mapToEvent(NewEventDto newEventDto, User initiator, Category category) {
         Event event = new Event();

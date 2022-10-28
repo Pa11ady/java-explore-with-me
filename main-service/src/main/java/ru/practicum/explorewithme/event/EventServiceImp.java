@@ -1,6 +1,8 @@
 package ru.practicum.explorewithme.event;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Filter;
+import org.hibernate.Session;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -18,9 +20,11 @@ import ru.practicum.explorewithme.request.dto.ParticipationRequestDto;
 import ru.practicum.explorewithme.user.UserRepository;
 import ru.practicum.explorewithme.user.model.User;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Transactional(readOnly = true)
@@ -30,6 +34,7 @@ public class EventServiceImp implements EventService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final RequestService requestService;
+    private final EntityManager entityManager;
 
     private Category getCategory(Long categoryId) {
         return categoryRepository.findById(categoryId)
@@ -46,9 +51,69 @@ public class EventServiceImp implements EventService {
                 .orElseThrow(() -> new NotFoundException("Событие ID=" + eventId + " не найдено!"));
     }
 
+    private void loadConfirmedRequests(EventShortDto eventShortDto) {
+        eventShortDto.setConfirmedRequests(requestService.getAmountConfirmedParticipants(eventShortDto.getId()));
+    }
+
+    private void loadConfirmedRequests(EventFullDto eventFullDto) {
+        eventFullDto.setConfirmedRequests(requestService.getAmountConfirmedParticipants(eventFullDto.getId()));
+    }
+
     @Override
-    public List<EventShortDto> findEvents(String text, Set<Long> categories, Boolean paid, LocalDateTime parse, LocalDateTime parse1, Boolean onlyAvailable, EventSort sort, Integer from, Integer size) {
-        return null;
+    public List<EventShortDto> findEvents(String text, Set<Long> categories, Boolean paid, LocalDateTime rangeStart,
+                                          LocalDateTime rangeEnd, Boolean onlyAvailable, EventSort sort, Integer from,
+                                          Integer size) {
+        rangeStart = (rangeStart != null) ? rangeStart : LocalDateTime.now();
+        rangeEnd = (rangeEnd != null) ? rangeEnd : LocalDateTime.now().plusYears(100);
+        if (rangeStart.isAfter(rangeEnd)) {
+            throw new NotValidException("Дата и время окончаний события не может быть раньше даты начала событий!");
+        }
+
+        Session session = entityManager.unwrap(Session.class);
+        session.enableFilter("stateFilter").setParameter("state", State.PUBLISHED.toString());
+
+        Filter dateFilter = session.enableFilter("dateFilter");
+        dateFilter.setParameter("rangeStart", rangeStart);
+        dateFilter.setParameter("rangeEnd", rangeEnd);
+
+        if (paid != null) {
+            session.enableFilter("paidFilter").setParameter("paid", paid);
+        }
+
+        List<Event> events;
+        if (categories != null) {
+            events = eventRepository.findByCategoryIdsAndText(categories, text);
+        } else {
+            events = eventRepository.findByText(text);
+        }
+
+        if (paid != null) {
+            session.disableFilter("paidFilter");
+        }
+        session.disableFilter("dateFilter");
+        session.disableFilter("stateFilter");
+
+        List<EventShortDto> dtoEventShorts = EventMapper.mapToEventShortDto(events);
+        dtoEventShorts.forEach(this::loadConfirmedRequests);
+        if (onlyAvailable) {
+            dtoEventShorts = dtoEventShorts.stream()
+                    .filter(x -> x.getConfirmedRequests() < x.getParticipantLimit())
+                    .collect(toList());
+        }
+        if (EventSort.VIEWS.equals(sort)) {
+            dtoEventShorts = dtoEventShorts.stream()
+                    .sorted(Comparator.comparingLong(EventShortDto::getViews))
+                    .skip(from)
+                    .limit(size)
+                    .collect(toList());
+        } else {
+            dtoEventShorts = dtoEventShorts.stream()
+                    .sorted(Comparator.comparing(EventShortDto::getEventDate))
+                    .skip(from)
+                    .limit(size)
+                    .collect(toList());
+        }
+        return dtoEventShorts;
     }
 
     @Override
@@ -58,7 +123,9 @@ public class EventServiceImp implements EventService {
             throw new ForbiddenException("Событие не опубликовано!");
         }
         //todo статистика
-        return EventMapper.mapToEventFullDto(event);
+        EventFullDto eventFullDto = EventMapper.mapToEventFullDto(event);
+        loadConfirmedRequests(eventFullDto);
+        return eventFullDto;
     }
 
     @Override
@@ -66,7 +133,9 @@ public class EventServiceImp implements EventService {
         getUser(userId);
         Pageable pageable = new OffsetPage(from, size, Sort.by(Sort.Direction.ASC, "id"));
         List<Event> events = eventRepository.findByInitiatorId(userId, pageable);
-        return EventMapper.mapToEventShortDto(events);
+        List<EventShortDto> dtoEventShorts = EventMapper.mapToEventShortDto(events);
+        dtoEventShorts.forEach(this::loadConfirmedRequests);
+        return dtoEventShorts;
     }
 
     @Override
@@ -192,7 +261,36 @@ public class EventServiceImp implements EventService {
     public List<EventFullDto> findEventsAdmin(Set<Long> users, Set<State> states, Set<Long> categories,
                                               LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from,
                                               Integer size) {
-        return null;
+        if (states == null) {
+            states = Set.of(State.PENDING, State.CANCELED, State.PUBLISHED);
+        }
+        rangeStart = (rangeStart != null) ? rangeStart : LocalDateTime.now();
+        rangeEnd = (rangeEnd != null) ? rangeEnd : LocalDateTime.now().plusYears(100);
+        if (rangeStart.isAfter(rangeEnd)) {
+            throw new NotValidException("Дата и время окончаний события не может быть раньше даты начала событий!");
+        }
+
+        Session session = entityManager.unwrap(Session.class);
+        Filter dateFilter = session.enableFilter("dateFilter");
+        dateFilter.setParameter("rangeStart", rangeStart);
+        dateFilter.setParameter("rangeEnd", rangeEnd);
+        Pageable pageable = new OffsetPage(from, size, Sort.by(Sort.Direction.ASC, "id"));
+
+        List<Event> events;
+        if (users != null && categories != null) {
+            events = eventRepository.findByUsersAndCategoriesAndStates(users, categories, states, pageable);
+        } else if (users == null && categories == null) {
+            events = eventRepository.findByStates(states, pageable);
+        } else if (users == null) {
+            events = eventRepository.findByCategoriesAndStates(categories, states, pageable);
+        } else {
+            events = eventRepository.findByUsersAndStates(users, states, pageable);
+        }
+
+        session.disableFilter("dateFilter");
+        List<EventFullDto> result = EventMapper.mapToEventFullDto(events);
+        result.forEach(this::loadConfirmedRequests);
+        return result;
     }
 
     @Transactional

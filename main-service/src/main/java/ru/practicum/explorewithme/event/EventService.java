@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 public interface EventService {
-    List<EventShortDto> findEvents(String text, Set<Long> categories, Boolean paid, LocalDateTime parse, LocalDateTime parse1, Boolean onlyAvailable, EventSort sort, Integer from, Integer size);
+    List<EventShortDto> findEvents(String text, Set<Long> categories, Boolean paid, LocalDateTime rangeStart,
+                                   LocalDateTime rangeEnd, Boolean onlyAvailable, EventSort sort, Integer from,
+                                   Integer size);
 
     EventFullDto findEventByID(Long eventId);
 

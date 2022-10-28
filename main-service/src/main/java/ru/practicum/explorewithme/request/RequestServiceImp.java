@@ -40,8 +40,8 @@ public class RequestServiceImp implements RequestService {
     }
 
     @Override
-    public int getAmountParticipants(Event event) {
-        return requestRepository.findAllByEventIdAndStatus(event.getId(), Status.CONFIRMED).size();
+    public long getAmountConfirmedParticipants(Long eventId) {
+        return requestRepository.findAllByEventIdAndStatus(eventId, Status.CONFIRMED).size();
     }
 
     @Override
@@ -54,9 +54,9 @@ public class RequestServiceImp implements RequestService {
     @Override
     public ParticipationRequestDto confirm(Event event, Long reqId) {
         ParticipationRequest participationRequest = getParticipationRequest(reqId);
-        int participants = 0;
+        long participants = 0;
         if (event.getParticipantLimit() != 0) {
-            participants = getAmountParticipants(event);
+            participants = getAmountConfirmedParticipants(event.getId());
             if (participants > event.getParticipantLimit()) {
                 throw new ForbiddenException("У события достигнут лимит запросов на участие!");
             }
@@ -98,7 +98,7 @@ public class RequestServiceImp implements RequestService {
             throw new ForbiddenException("Нельзя добавить повторный запрос!");
         }
         if (event.getParticipantLimit() != 0) {
-            if (getAmountParticipants(event) > event.getParticipantLimit()) {
+            if (getAmountConfirmedParticipants(eventId) > event.getParticipantLimit()) {
                 throw new ForbiddenException("Достигнут лимит запросов на участие!");
             }
         }
