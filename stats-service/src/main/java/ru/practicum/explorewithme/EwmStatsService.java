@@ -8,5 +8,4 @@ public class EwmStatsService {
 	public static void main(String[] args) {
 		SpringApplication.run(EwmStatsService.class, args);
 	}
-
 }
