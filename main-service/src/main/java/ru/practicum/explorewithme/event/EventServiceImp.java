@@ -17,6 +17,7 @@ import ru.practicum.explorewithme.event.dto.*;
 import ru.practicum.explorewithme.event.model.Event;
 import ru.practicum.explorewithme.request.RequestService;
 import ru.practicum.explorewithme.request.dto.ParticipationRequestDto;
+import ru.practicum.explorewithme.stats.StatsService;
 import ru.practicum.explorewithme.user.UserRepository;
 import ru.practicum.explorewithme.user.model.User;
 
@@ -35,6 +36,7 @@ public class EventServiceImp implements EventService {
     private final UserRepository userRepository;
     private final RequestService requestService;
     private final EntityManager entityManager;
+    private final StatsService statsService;
 
     private Category getCategory(Long categoryId) {
         return categoryRepository.findById(categoryId)
@@ -57,6 +59,16 @@ public class EventServiceImp implements EventService {
 
     private void loadConfirmedRequests(EventFullDto eventFullDto) {
         eventFullDto.setConfirmedRequests(requestService.getAmountConfirmedParticipants(eventFullDto.getId()));
+    }
+
+    private void loadViews(EventShortDto eventShortDto) {
+        Long views = statsService.getViews("/events/" + eventShortDto.getId());
+        eventShortDto.setViews(views);
+    }
+
+    private void loadViews(EventFullDto eventFullDto) {
+        Long views = statsService.getViews("/events/" +  eventFullDto.getId());
+        eventFullDto.setViews(views);
     }
 
     @Override
@@ -95,6 +107,7 @@ public class EventServiceImp implements EventService {
 
         List<EventShortDto> dtoEventShorts = EventMapper.mapToEventShortDto(events);
         dtoEventShorts.forEach(this::loadConfirmedRequests);
+        dtoEventShorts.forEach(this::loadViews);
         if (onlyAvailable) {
             dtoEventShorts = dtoEventShorts.stream()
                     .filter(x -> x.getConfirmedRequests() < x.getParticipantLimit())
@@ -122,9 +135,9 @@ public class EventServiceImp implements EventService {
         if (!State.PUBLISHED.equals(event.getState())) {
             throw new ForbiddenException("Событие не опубликовано!");
         }
-        //todo статистика
         EventFullDto eventFullDto = EventMapper.mapToEventFullDto(event);
         loadConfirmedRequests(eventFullDto);
+        loadViews(eventFullDto);
         return eventFullDto;
     }
 
@@ -135,6 +148,7 @@ public class EventServiceImp implements EventService {
         List<Event> events = eventRepository.findByInitiatorId(userId, pageable);
         List<EventShortDto> dtoEventShorts = EventMapper.mapToEventShortDto(events);
         dtoEventShorts.forEach(this::loadConfirmedRequests);
+        dtoEventShorts.forEach(this::loadViews);
         return dtoEventShorts;
     }
 
@@ -290,6 +304,7 @@ public class EventServiceImp implements EventService {
         session.disableFilter("dateFilter");
         List<EventFullDto> result = EventMapper.mapToEventFullDto(events);
         result.forEach(this::loadConfirmedRequests);
+        result.forEach(this::loadViews);
         return result;
     }
 

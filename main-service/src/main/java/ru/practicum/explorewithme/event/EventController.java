@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.event.dto.*;
 import ru.practicum.explorewithme.request.dto.ParticipationRequestDto;
+import ru.practicum.explorewithme.stats.StatsService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -23,6 +24,7 @@ import java.util.Set;
 public class EventController {
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private final EventService eventService;
+    private final StatsService statsService;
 
     @GetMapping("/events")
     public List<EventShortDto> findEvents(@RequestParam(defaultValue = "") String text,
@@ -37,9 +39,11 @@ public class EventController {
                                                 HttpServletRequest request) {
         log.info("{}: {}; получение списка событий",
                 request.getRemoteAddr(), request.getRequestURI());
-        return eventService.findEvents(text, categories, paid, LocalDateTime.parse(rangeStart,
-                        DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), LocalDateTime.parse(rangeEnd,
+        List<EventShortDto> result = eventService.findEvents(text, categories, paid, LocalDateTime.parse(rangeStart,
+                DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), LocalDateTime.parse(rangeEnd,
                 DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), onlyAvailable, sort, from, size);
+        statsService.setHits(request.getRequestURI(), request.getRemoteAddr());
+        return result;
     }
 
     @GetMapping("/events/{eventId}")
@@ -49,7 +53,7 @@ public class EventController {
                 request.getRequestURI(),
                 eventId);
         EventFullDto eventFullDto = eventService.findEventByID(eventId);
-        //todo статистика
+        statsService.setHits(request.getRequestURI(), request.getRemoteAddr());
         return eventFullDto;
     }
 

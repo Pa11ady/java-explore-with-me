@@ -25,12 +25,9 @@ public class StatsServiceImp implements StatsService {
     @Transactional(readOnly = true)
     @Override
     public List<ViewStats> findStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        List<ViewStats> res;
         if (unique) {
-            res = statsRepository.calculateUniqueStats(uris, start, end);
-        } else {
-            res = statsRepository.calculateStats(uris, start, end);
+            return statsRepository.calculateUniqueStats(uris, start, end);
         }
-        return res;
+        return statsRepository.calculateStats(uris, start, end);
     }
 }
