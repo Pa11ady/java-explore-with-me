@@ -11,11 +11,11 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/users")
+@RequestMapping(path = "/users/{userId}/requests")
 public class RequestController {
     private final RequestService requestService;
 
-    @GetMapping("/{userId}/requests")
+    @GetMapping
     public List<ParticipationRequestDto> findRequestsByUserId(@PathVariable Long userId,
                                                               HttpServletRequest request) {
         log.info("{}: {}; получение заявок от пользователя ID={}",
@@ -23,7 +23,7 @@ public class RequestController {
         return requestService.findRequestsByUserId(userId);
     }
 
-    @PostMapping("/{userId}/requests")
+    @PostMapping
     public ParticipationRequestDto create(@RequestParam Long eventId,
                                           @PathVariable Long userId,
                                           HttpServletRequest request) {
@@ -32,7 +32,7 @@ public class RequestController {
         return requestService.create(userId, eventId);
     }
 
-    @PatchMapping("/{userId}/requests/{requestId}/cancel")
+    @PatchMapping("/{requestId}/cancel")
     public ParticipationRequestDto cancel(@PathVariable Long userId,
                                           @PathVariable Long requestId,
                                           HttpServletRequest request) {

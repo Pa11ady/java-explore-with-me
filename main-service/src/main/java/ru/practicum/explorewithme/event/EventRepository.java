@@ -13,35 +13,35 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findByCategoryId(Long categoryId);
 
-    @Query("SELECT e FROM Event AS e " +
-            "WHERE (LOWER(e.annotation) LIKE CONCAT('%',LOWER(:text),'%') OR " +
-            "LOWER(e.description) LIKE CONCAT('%',LOWER(:text),'%'))")
+    @Query("SELECT ev FROM Event AS ev " +
+            "WHERE (LOWER(ev.annotation) LIKE CONCAT('%',LOWER(:text),'%') OR " +
+            "LOWER(ev.description) LIKE CONCAT('%',LOWER(:text),'%'))")
     List<Event> findByText(String text);
 
-    @Query("SELECT e FROM Event AS e " +
-            "WHERE (e.category.id IN :categories) AND " +
-            "(LOWER(e.annotation) LIKE CONCAT('%',LOWER(:text),'%') OR " +
-            "LOWER(e.description) LIKE CONCAT('%',LOWER(:text),'%'))")
+    @Query("SELECT ev FROM Event AS ev " +
+            "WHERE (ev.category.id IN :categories) AND " +
+            "(LOWER(ev.annotation) LIKE CONCAT('%',LOWER(:text),'%') OR " +
+            "LOWER(ev.description) LIKE CONCAT('%',LOWER(:text),'%'))")
     List<Event> findByCategoryIdsAndText(Collection<Long> categories, String text);
 
-    @Query("SELECT e FROM Event AS e " +
-            "WHERE (e.category.id IN :categories) AND " +
-            "(e.initiator.id IN :users) AND " +
-            "(e.state IN :states)")
+    @Query("SELECT ev FROM Event AS ev " +
+            "WHERE (ev.category.id IN :categories) AND " +
+            "(ev.initiator.id IN :users) AND " +
+            "(ev.state IN :states)")
     List<Event> findByUsersAndCategoriesAndStates(Collection<Long> users, Collection<Long> categories,
                                                   Collection<State> states, Pageable pageable);
 
-    @Query("SELECT e FROM Event AS e " +
-            "WHERE (e.state IN :states)")
+    @Query("SELECT ev FROM Event AS ev " +
+            "WHERE (ev.state IN :states)")
     List<Event> findByStates(Collection<State> states, Pageable pageable);
 
-    @Query("SELECT e FROM Event AS e " +
-            "WHERE (e.category.id IN :categories) AND " +
-            "(e.state IN :states)")
+    @Query("SELECT ev FROM Event AS ev " +
+            "WHERE (ev.category.id IN :categories) AND " +
+            "(ev.state IN :states)")
     List<Event> findByCategoriesAndStates(Collection<Long> categories, Collection<State> states, Pageable pageable);
 
-    @Query("SELECT e FROM Event AS e " +
-            "WHERE (e.initiator.id IN :users) AND " +
-            "(e.state IN :states)")
+    @Query("SELECT ev FROM Event AS ev " +
+            "WHERE (ev.initiator.id IN :users) AND " +
+            "(ev.state IN :states)")
     List<Event> findByUsersAndStates(Collection<Long> users, Collection<State> states, Pageable pageable);
 }

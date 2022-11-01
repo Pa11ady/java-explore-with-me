@@ -71,19 +71,12 @@ public class EventServiceImp implements EventService {
         eventFullDto.setViews(views);
     }
 
-    @Override
-    public List<EventShortDto> findEvents(String text, Set<Long> categories, Boolean paid, LocalDateTime rangeStart,
-                                          LocalDateTime rangeEnd, Boolean onlyAvailable, EventSort sort, Integer from,
-                                          Integer size) {
+    private void setFilters(Session session, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean paid) {
         rangeStart = (rangeStart != null) ? rangeStart : LocalDateTime.now();
         rangeEnd = (rangeEnd != null) ? rangeEnd : LocalDateTime.now().plusYears(100);
         if (rangeStart.isAfter(rangeEnd)) {
             throw new NotValidException("Дата и время окончаний события не может быть раньше даты начала событий!");
         }
-
-        Session session = entityManager.unwrap(Session.class);
-        session.enableFilter("stateFilter").setParameter("state", State.PUBLISHED.toString());
-
         Filter dateFilter = session.enableFilter("dateFilter");
         dateFilter.setParameter("rangeStart", rangeStart);
         dateFilter.setParameter("rangeEnd", rangeEnd);
@@ -91,6 +84,21 @@ public class EventServiceImp implements EventService {
         if (paid != null) {
             session.enableFilter("paidFilter").setParameter("paid", paid);
         }
+    }
+
+    private void disableFilters(Session session) {
+        session.disableFilter("dateFilter");
+        session.disableFilter("stateFilter");
+        session.disableFilter("paidFilter");
+    }
+
+    @Override
+    public List<EventShortDto> findEvents(String text, Set<Long> categories, Boolean paid, LocalDateTime rangeStart,
+                                          LocalDateTime rangeEnd, Boolean onlyAvailable, EventSort sort, Integer from,
+                                          Integer size) {
+        Session session = entityManager.unwrap(Session.class);
+        session.enableFilter("stateFilter").setParameter("state", State.PUBLISHED.toString());
+        setFilters(session, rangeStart, rangeEnd, paid);
 
         List<Event> events;
         if (categories != null) {
@@ -99,12 +107,7 @@ public class EventServiceImp implements EventService {
             events = eventRepository.findByText(text);
         }
 
-        if (paid != null) {
-            session.disableFilter("paidFilter");
-        }
-        session.disableFilter("dateFilter");
-        session.disableFilter("stateFilter");
-
+        disableFilters(session);
         List<EventShortDto> dtoEventShorts = EventMapper.mapToEventShortDto(events);
         dtoEventShorts.forEach(this::loadConfirmedRequests);
         dtoEventShorts.forEach(this::loadViews);
@@ -278,16 +281,8 @@ public class EventServiceImp implements EventService {
         if (states == null) {
             states = Set.of(State.PENDING, State.CANCELED, State.PUBLISHED);
         }
-        rangeStart = (rangeStart != null) ? rangeStart : LocalDateTime.now();
-        rangeEnd = (rangeEnd != null) ? rangeEnd : LocalDateTime.now().plusYears(100);
-        if (rangeStart.isAfter(rangeEnd)) {
-            throw new NotValidException("Дата и время окончаний события не может быть раньше даты начала событий!");
-        }
-
         Session session = entityManager.unwrap(Session.class);
-        Filter dateFilter = session.enableFilter("dateFilter");
-        dateFilter.setParameter("rangeStart", rangeStart);
-        dateFilter.setParameter("rangeEnd", rangeEnd);
+        setFilters(session, rangeStart, rangeEnd, null);
         Pageable pageable = new OffsetPage(from, size, Sort.by(Sort.Direction.ASC, "id"));
 
         List<Event> events;

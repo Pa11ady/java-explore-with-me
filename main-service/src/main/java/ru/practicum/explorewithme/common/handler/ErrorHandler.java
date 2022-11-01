@@ -11,15 +11,9 @@ import ru.practicum.explorewithme.common.exception.StateIsNotSupportException;
 
 @RestControllerAdvice
 public class ErrorHandler {
-    @ExceptionHandler
+    @ExceptionHandler({StateIsNotSupportException.class, NotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleStateIsNotSupportException(StateIsNotSupportException e) {
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleNotValidException(final NotValidException e) {
+    public ErrorResponse handleBadRequest(RuntimeException e) {
         return new ErrorResponse(e.getMessage());
     }
 

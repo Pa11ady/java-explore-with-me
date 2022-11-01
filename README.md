@@ -22,6 +22,6 @@ Explore With Me — приложение, которое дает возможн
 
 ## Инструкция
 
-*Собрать проект командой mvn clean package
-*Запустить из каталога проекта под правами админстратора docker-compose up
-*[Тесты postman](https://github.com/yandex-praktikum/java-explore-with-me/blob/develop/postman/ewm-main-service.json)
+* Собрать проект командой: mvn clean package
+* Запустить из каталога проекта под правами администратора: docker-compose up
+* [Тесты postman](https://github.com/yandex-praktikum/java-explore-with-me/blob/develop/postman/ewm-main-service.json)
