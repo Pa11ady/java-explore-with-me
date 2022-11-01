@@ -38,6 +38,18 @@ public class EventServiceImp implements EventService {
     private final EntityManager entityManager;
     private final StatsService statsService;
 
+    private void statePublishedIsError(Event event) {
+        if (State.PUBLISHED.equals(event.getState())) {
+            throw new ForbiddenException("Можно изменить только ожидающие или отмененные события");
+        }
+    }
+
+    private void stateNotPublishedIsError(Event event, String errorMsg) {
+        if (!State.PUBLISHED.equals(event.getState())) {
+            throw new ForbiddenException(errorMsg);
+        }
+    }
+
     private Category getCategory(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundException("Категория ID=" + categoryId + " не найдена!"));
@@ -135,9 +147,8 @@ public class EventServiceImp implements EventService {
     @Override
     public EventFullDto findEventByID(Long eventId) {
         Event event = getEvent(eventId);
-        if (!State.PUBLISHED.equals(event.getState())) {
-            throw new ForbiddenException("Событие не опубликовано!");
-        }
+        stateNotPublishedIsError(event, "Событие не опубликовано!");
+
         EventFullDto eventFullDto = EventMapper.mapToEventFullDto(event);
         loadConfirmedRequests(eventFullDto);
         loadViews(eventFullDto);
@@ -170,9 +181,7 @@ public class EventServiceImp implements EventService {
         if (!userId.equals(event.getInitiator().getId())) {
             throw new ForbiddenException("Отредактировать событие может только инициатор!");
         }
-        if (event.getState().equals(State.PUBLISHED)) {
-            throw new ForbiddenException("Можно изменить только ожидающие или отмененные события");
-        }
+        statePublishedIsError(event);
         if (updateEventRequest.getAnnotation() != null) {
             event.setAnnotation(updateEventRequest.getAnnotation());
         }
@@ -255,9 +264,7 @@ public class EventServiceImp implements EventService {
         if (!event.getInitiator().getId().equals(userId)) {
             throw new ForbiddenException("Запрос может подтверждать лишь инициатор!");
         }
-        if (!event.getState().equals(State.PUBLISHED)) {
-            throw new ForbiddenException("Нельзя подтверждать в неопубликованном событии!");
-        }
+        stateNotPublishedIsError(event, "Нельзя подтверждать в неопубликованном событии!");
         return requestService.confirm(event, reqId);
     }
 
@@ -268,9 +275,7 @@ public class EventServiceImp implements EventService {
         if (!event.getInitiator().getId().equals(userId)) {
             throw new ForbiddenException("Запрос может отклонять лишь инициатор!");
         }
-        if (!event.getState().equals(State.PUBLISHED)) {
-            throw new ForbiddenException("Нельзя отклонять в неопубликованном событии!");
-        }
+        stateNotPublishedIsError(event, "Нельзя отклонять в неопубликованном событии!");
         return requestService.reject(reqId);
     }
 
