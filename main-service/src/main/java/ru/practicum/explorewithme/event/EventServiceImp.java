@@ -145,7 +145,7 @@ public class EventServiceImp implements EventService {
     }
 
     @Override
-    public EventFullDto findEventByID(Long eventId) {
+    public EventFullDto findEventById(Long eventId) {
         Event event = getEvent(eventId);
         stateNotPublishedIsError(event, "Событие не опубликовано!");
 

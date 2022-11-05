@@ -52,7 +52,7 @@ public class EventController {
                 request.getRemoteAddr(),
                 request.getRequestURI(),
                 eventId);
-        EventFullDto eventFullDto = eventService.findEventByID(eventId);
+        EventFullDto eventFullDto = eventService.findEventById(eventId);
         statsService.setHits(request.getRequestURI(), request.getRemoteAddr());
         return eventFullDto;
     }
