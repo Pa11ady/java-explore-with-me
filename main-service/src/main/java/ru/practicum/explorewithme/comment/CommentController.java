@@ -106,9 +106,18 @@ public class CommentController {
                                             HttpServletRequest request) {
         log.info("{}: {}; админ получение списка комментариев",
                 request.getRemoteAddr(), request.getRequestURI());
-        return commentService.adminFindComments(users, statuses, LocalDateTime.parse(rangeStart,
-                DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), LocalDateTime.parse(rangeEnd,
-                DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), from, size);
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+
+        if (rangeStart != null) {
+            start = LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
+
+        }
+        if (rangeEnd != null) {
+            end = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
+
+        }
+        return commentService.adminFindComments(users, statuses, start, end, from, size);
     }
 
     @DeleteMapping("/admin/comments/{commentId}")
@@ -118,7 +127,7 @@ public class CommentController {
         commentService.adminDelete(commentId);
     }
 
-    @PutMapping("/admin/comments/")
+    @PutMapping("/admin/comments")
     public CommentDto adminUpdate(@RequestBody @Valid UpdateCommentRequest updateCommentRequest,
                                   HttpServletRequest request) {
         log.info("{}: {}; редактирование события ID={}",

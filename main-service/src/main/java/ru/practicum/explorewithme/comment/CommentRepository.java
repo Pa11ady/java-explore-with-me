@@ -11,7 +11,7 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByAuthorId(Long userId, Pageable page);
 
-    List<Comment> findByEventId(Long eventId, Pageable page);
+    List<Comment> findByEventIdAndStatus(Long eventId, Status status, Pageable page);
 
     @Query("SELECT c FROM Comment AS c " +
             "WHERE (c.status IN :statuses)")

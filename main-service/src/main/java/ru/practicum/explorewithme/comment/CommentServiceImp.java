@@ -73,7 +73,7 @@ public class CommentServiceImp implements CommentService {
             session.enableFilter("usersFilter").setParameterList("userIds", users);
         }
 
-        rangeStart = (rangeStart != null) ? rangeStart : LocalDateTime.now();
+        rangeStart = (rangeStart != null) ? rangeStart : LocalDateTime.now().minusYears(100);
         rangeEnd = (rangeEnd != null) ? rangeEnd : LocalDateTime.now().plusYears(100);
         if (rangeStart.isAfter(rangeEnd)) {
             throw new NotValidException("Дата и время окончаний события не может быть раньше даты начала событий!");
@@ -88,10 +88,6 @@ public class CommentServiceImp implements CommentService {
     public CommentDto create(Long userId, NewCommentDto newCommentDto) {
         User user = getUser(userId);
         Event event = getEvent(newCommentDto.getEventId());
-
-        if (event.getEventDate().isAfter(LocalDateTime.now())) {
-            throw new NotValidException("Нельзя оставлять комментарии на событие, которое не началось");
-        }
         Comment comment = new Comment(null, newCommentDto.getText(), user, LocalDateTime.now(), event, Status.PENDING);
         return CommentMapper.mapToCommentDto(commentRepository.save(comment));
     }
@@ -128,7 +124,8 @@ public class CommentServiceImp implements CommentService {
     public List<CommentDto> findCommentsByEvent(Long eventId, Integer from, Integer size) {
         getEvent(eventId);
         Pageable pageable = new OffsetPage(from, size, Sort.by(Sort.Direction.ASC, "id"));
-        return CommentMapper.mapToCommentDto(commentRepository.findByEventId(eventId, pageable));
+        return CommentMapper.mapToCommentDto(commentRepository.findByEventIdAndStatus(eventId,
+                Status.APPROVED, pageable));
     }
 
     @Override

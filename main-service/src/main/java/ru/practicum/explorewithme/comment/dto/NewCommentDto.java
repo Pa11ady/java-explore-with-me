@@ -15,6 +15,6 @@ import javax.validation.constraints.Size;
 public class NewCommentDto {
     @NotNull
     private Long eventId;
-    @Size(min = 20, max = 2000)
+    @Size(min = 5, max = 2000)
     private  String text;
 }

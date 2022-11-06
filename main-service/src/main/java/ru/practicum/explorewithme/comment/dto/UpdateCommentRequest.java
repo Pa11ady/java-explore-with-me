@@ -13,6 +13,6 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class UpdateCommentRequest {
     private  Long id;
-    @Size(min = 20, max = 2000)
+    @Size(min = 5, max = 2000)
     private  String text;
 }
