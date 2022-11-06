@@ -3,7 +3,6 @@ package ru.practicum.explorewithme.comment;
 import ru.practicum.explorewithme.comment.dto.CommentDto;
 import ru.practicum.explorewithme.comment.dto.NewCommentDto;
 import ru.practicum.explorewithme.comment.dto.UpdateCommentRequest;
-import ru.practicum.explorewithme.event.State;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,8 +25,8 @@ public interface CommentService {
 
     CommentDto adminReject(Long commentId);
 
-    List<CommentDto> adminFindEvents(Set<Long> users, Set<State> states, LocalDateTime rangeStart,
-                                     LocalDateTime rangeEnd, Integer from, Integer size);
+    List<CommentDto> adminFindComments(Set<Long> users, Set<Status> statuses, LocalDateTime rangeStart,
+                                       LocalDateTime rangeEnd, Integer from, Integer size);
 
     void adminDelete(Long commentId);
 

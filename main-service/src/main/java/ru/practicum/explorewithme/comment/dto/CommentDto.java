@@ -9,9 +9,7 @@ import ru.practicum.explorewithme.comment.Status;
 import ru.practicum.explorewithme.event.dto.EventShortDto;
 import ru.practicum.explorewithme.user.dto.UserShortDto;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Getter
 @Setter

@@ -2,10 +2,7 @@ package ru.practicum.explorewithme.comment;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.practicum.explorewithme.category.dto.NewCategoryDto;
-import ru.practicum.explorewithme.category.model.Category;
 import ru.practicum.explorewithme.comment.dto.CommentDto;
-import ru.practicum.explorewithme.comment.dto.NewCommentDto;
 import ru.practicum.explorewithme.comment.model.Comment;
 import ru.practicum.explorewithme.event.EventMapper;
 import ru.practicum.explorewithme.user.dto.UserShortDto;

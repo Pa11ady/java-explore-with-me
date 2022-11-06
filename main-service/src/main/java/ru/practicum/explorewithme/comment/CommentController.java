@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.comment.dto.CommentDto;
 import ru.practicum.explorewithme.comment.dto.NewCommentDto;
 import ru.practicum.explorewithme.comment.dto.UpdateCommentRequest;
-import ru.practicum.explorewithme.event.State;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -98,8 +97,8 @@ public class CommentController {
     }
 
     @GetMapping("/admin/comments")
-    public List<CommentDto> adminFindEvents(@RequestParam(required = false) Set<Long> users,
-                                            @RequestParam(required = false) Set<State> states,
+    public List<CommentDto> adminFindComments(@RequestParam(required = false) Set<Long> users,
+                                            @RequestParam(required = false) Set<Status> statuses,
                                             @RequestParam(required = false) String rangeStart,
                                             @RequestParam(required = false) String rangeEnd,
                                             @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
@@ -107,7 +106,7 @@ public class CommentController {
                                             HttpServletRequest request) {
         log.info("{}: {}; админ получение списка комментариев",
                 request.getRemoteAddr(), request.getRequestURI());
-        return commentService.adminFindEvents(users, states, LocalDateTime.parse(rangeStart,
+        return commentService.adminFindComments(users, statuses, LocalDateTime.parse(rangeStart,
                 DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), LocalDateTime.parse(rangeEnd,
                 DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), from, size);
     }
