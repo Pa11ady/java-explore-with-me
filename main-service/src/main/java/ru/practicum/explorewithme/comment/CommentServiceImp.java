@@ -64,7 +64,7 @@ public class CommentServiceImp implements CommentService {
     private void checkAuthor(Comment comment, User user) {
         Long userId = user.getId();
         if (!userId.equals(comment.getAuthor().getId())) {
-            throw new ForbiddenException("Отредактировать комментарий может только автор!");
+            throw new ForbiddenException("Нет прав выполнить операцию!");
         }
     }
 
