@@ -15,12 +15,6 @@ import java.time.LocalDateTime;
 @FilterDef(name = "usersFilter", parameters = @ParamDef(name = "userIds", type = "java.lang.Long"))
 @Filter(name = "usersFilter", condition = "author_id in (:userIds)")
 
-@FilterDef(name = "dateFilter",
-        parameters = {
-                @ParamDef(name = "rangeStart", type = "java.time.LocalDateTime"),
-                @ParamDef(name = "rangeEnd", type = "java.time.LocalDateTime")})
-@Filter(name = "dateFilter", condition = "created >= :rangeStart and created <= :rangeEnd")
-
 @Getter
 @Setter
 @ToString

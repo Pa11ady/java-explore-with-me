@@ -1,7 +1,6 @@
 package ru.practicum.explorewithme.comment;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -66,21 +65,6 @@ public class CommentServiceImp implements CommentService {
         if (!userId.equals(comment.getAuthor().getId())) {
             throw new ForbiddenException("Нет прав выполнить операцию!");
         }
-    }
-
-    private void setFilters(Session session,  Set<Long> users, LocalDateTime rangeStart, LocalDateTime rangeEnd) {
-        if (users != null) {
-            session.enableFilter("usersFilter").setParameterList("userIds", users);
-        }
-
-        rangeStart = (rangeStart != null) ? rangeStart : LocalDateTime.now().minusYears(100);
-        rangeEnd = (rangeEnd != null) ? rangeEnd : LocalDateTime.now().plusYears(100);
-        if (rangeStart.isAfter(rangeEnd)) {
-            throw new NotValidException("Дата и время окончаний события не может быть раньше даты начала событий!");
-        }
-        Filter dateFilter = session.enableFilter("dateFilter");
-        dateFilter.setParameter("rangeStart", rangeStart);
-        dateFilter.setParameter("rangeEnd", rangeEnd);
     }
 
     @Transactional
@@ -159,13 +143,21 @@ public class CommentServiceImp implements CommentService {
         if (statuses == null) {
             statuses = Set.of(Status.PENDING, Status.APPROVED, Status.REJECTED);
         }
+
+        rangeStart = (rangeStart != null) ? rangeStart : LocalDateTime.now().minusYears(100);
+        rangeEnd = (rangeEnd != null) ? rangeEnd : LocalDateTime.now().plusYears(100);
+        if (rangeStart.isAfter(rangeEnd)) {
+            throw new NotValidException("Дата и время окончаний события не может быть раньше даты начала событий!");
+        }
+
         Session session = entityManager.unwrap(Session.class);
-        setFilters(session, users, rangeStart, rangeEnd);
+        if (users != null) {
+            session.enableFilter("usersFilter").setParameterList("userIds", users);
+        }
         Pageable pageable = new OffsetPage(from, size, Sort.by(Sort.Direction.ASC, "id"));
 
-        List<Comment> result = commentRepository.findByStatuses(statuses, pageable);
+        List<Comment> result = commentRepository.findByStatuses(statuses, rangeStart, rangeEnd, pageable);
 
-        session.disableFilter("dateFilter");
         session.disableFilter("usersFilter");
 
         return CommentMapper.mapToCommentDto(result);
