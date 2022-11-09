@@ -39,9 +39,19 @@ public class EventController {
                                                 HttpServletRequest request) {
         log.info("{}: {}; получение списка событий",
                 request.getRemoteAddr(), request.getRequestURI());
-        List<EventShortDto> result = eventService.findEvents(text, categories, paid, LocalDateTime.parse(rangeStart,
-                DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), LocalDateTime.parse(rangeEnd,
-                DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), onlyAvailable, sort, from, size);
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+
+        if (rangeStart != null) {
+            start = LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
+
+        }
+        if (rangeEnd != null) {
+            end = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
+
+        }
+        List<EventShortDto> result = eventService.findEvents(text, categories, paid, start, end, onlyAvailable,
+                sort, from, size);
         statsService.setHits(request.getRequestURI(), request.getRemoteAddr());
         return result;
     }
@@ -145,9 +155,18 @@ public class EventController {
                                               HttpServletRequest request) {
         log.info("{}: {}; получение списка событий",
                 request.getRemoteAddr(), request.getRequestURI());
-        return eventService.findEventsAdmin(users, states, categories, LocalDateTime.parse(rangeStart,
-                DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), LocalDateTime.parse(rangeEnd,
-                DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)), from, size);
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+
+        if (rangeStart != null) {
+            start = LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
+
+        }
+        if (rangeEnd != null) {
+            end = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
+
+        }
+        return eventService.findEventsAdmin(users, states, categories, start, end, from, size);
     }
 
     @PutMapping("/admin/events/{eventId}")

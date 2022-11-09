@@ -123,7 +123,7 @@ public class EventServiceImp implements EventService {
         List<EventShortDto> dtoEventShorts = EventMapper.mapToEventShortDto(events);
         dtoEventShorts.forEach(this::loadConfirmedRequests);
         dtoEventShorts.forEach(this::loadViews);
-        if (onlyAvailable) {
+        if (onlyAvailable != null && onlyAvailable) {
             dtoEventShorts = dtoEventShorts.stream()
                     .filter(x -> x.getConfirmedRequests() < x.getParticipantLimit())
                     .collect(toList());
