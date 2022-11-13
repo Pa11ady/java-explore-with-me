@@ -12,7 +12,7 @@ public interface EventService {
                                    LocalDateTime rangeEnd, Boolean onlyAvailable, EventSort sort, Integer from,
                                    Integer size);
 
-    EventFullDto findEventByID(Long eventId);
+    EventFullDto findEventById(Long eventId);
 
     List<EventShortDto> findEventsByUser(Long userId, Integer from, Integer size);
 

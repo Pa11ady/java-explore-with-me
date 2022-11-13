@@ -1,13 +1,20 @@
 package ru.practicum.explorewithme.common.handler;
 
+import lombok.*;
+import org.springframework.http.HttpStatus;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class ErrorResponse {
-    private final String error;
-
-    public ErrorResponse(String error) {
-        this.error = error;
-    }
-
-    public String getError() {
-        return error;
-    }
+    private List<String> errors;
+    private String message;
+    private String reason;
+    private HttpStatus status;
+    private LocalDateTime timestamp;
 }
